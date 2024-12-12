@@ -430,6 +430,12 @@ class BaseEditingVectorOnModelApiView(BaseVectorApiView):
                                     'id': server_fid(feature, metadata_layer.qgis_layer.dataProvider()),
                                     'properties': jfeature['properties']
                                 })
+
+                                # Locking features new:
+                                to_res_lock = metadata_layer.lock.modelLock2dict(
+                                    metadata_layer.lock.lockFeature(
+                                        str(server_fid(feature, metadata_layer.qgis_layer.dataProvider())), save=True)
+                                )
                             else:
                                 to_res_update.update({
                                     # This might be the internal QGIS feature id (< 0)
@@ -437,11 +443,7 @@ class BaseEditingVectorOnModelApiView(BaseVectorApiView):
                                     'properties': jfeature['properties']
                                 })
 
-                            # lock news:
-                            to_res_lock = metadata_layer.lock.modelLock2dict(
-                                metadata_layer.lock.lockFeature(
-                                    str(server_fid(feature, metadata_layer.qgis_layer.dataProvider())), save=True)
-                            )
+
 
                         if bool(to_res):
                             insert_ids.append(to_res)
@@ -661,7 +663,7 @@ class BaseEditingVectorOnModelApiView(BaseVectorApiView):
                     'new': ref_insert_ids,
                     'new_lockids': ref_lock_ids,
                     'relations': relations,
-                    'update': [],
+                    'update': ref_update_ids,
 
                 }
             })
