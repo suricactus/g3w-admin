@@ -16,24 +16,15 @@ import os
 import zipfile
 from io import BytesIO
 
-from django.conf import settings
-from django.contrib.auth.models import User
+from django.db import transaction
 from django.test import Client
 from django.urls import reverse
-from guardian.shortcuts import assign_perm, get_anonymous_user
-from qgis.core import QgsVectorLayer, QgsFeatureRequest, QgsExpression, Qgis
+from qgis.core import QgsVectorLayer
 from django.db import IntegrityError
 from django.core.exceptions import ValidationError
 
 from qdjango.apps import QGS_SERVER, get_qgs_project
 from qdjango.models import (
-    ConstraintSubsetStringRule,
-    ConstraintExpressionRule,
-    SingleLayerConstraint,
-    SessionTokenFilter,
-    SessionTokenFilterLayer,
-    GeoConstraint,
-    GeoConstraintRule,
     Layer,
     Project,
     ColumnAcl
@@ -52,63 +43,66 @@ logger = logging.getLogger(__name__)
 class TestColumnAcl(QdjangoTestBase):
     """Test column ACL"""
 
-    @classmethod
-    def setUpTestData(cls):
+    def setUp(self):
 
-        super().setUpTestData()
-        cls.qdjango_project = Project.objects.all()[0]
-        cls.world = cls.qdjango_project.layer_set.filter(
+        super().setUp()
+
+        self.qdjango_project = Project.objects.all()[0]
+        self.world = self.qdjango_project.layer_set.filter(
             qgs_layer_id='world20181008111156525')[0]
-        cls.spatialite_points = cls.qdjango_project.layer_set.filter(
+        self.spatialite_points = self.qdjango_project.layer_set.filter(
             qgs_layer_id='spatialite_points20190604101052075')[0]
         # Make a cloned layer
-        cls.cloned_project = Project(
-            group=cls.qdjango_project.group, title='My Clone')
+        self.cloned_project = Project(
+            group=self.qdjango_project.group, title='My Clone')
 
-        cls.cloned_project.qgis_file = cls.qdjango_project.qgis_file
-        cls.cloned_project.save()
-        cls.cloned_layer = cls.qdjango_project.layer_set.filter(
+        self.cloned_project.qgis_file = self.qdjango_project.qgis_file
+        self.cloned_project.save()
+        self.cloned_layer = self.qdjango_project.layer_set.filter(
             qgs_layer_id='world20181008111156525')[0]
-        cls.cloned_layer.pk = None
-        cls.cloned_layer.project = cls.cloned_project
-        cls.cloned_layer.save()
+        self.cloned_layer.pk = None
+        self.cloned_layer.project = self.cloned_project
+        self.cloned_layer.save()
         assert Layer.objects.filter(
             qgs_layer_id='world20181008111156525').count() == 2
 
-        assert not cls.world.has_column_acl
+        assert not self.world.has_column_acl
 
-    @classmethod
-    def setUpClass(cls):
-        super().setUpClass()
-
-        # Add admin01 to a group
-        cls.viewer1_group = cls.main_roles['Viewer Level 1']
-        cls.viewer1_group.user_set.add(cls.test_user1)
-
-        ColumnAcl.objects.all().delete()
-
-        for l in Layer.objects.all():
-            l.has_column_acl = False
-            l.save()
-
-        assert not cls.cloned_layer.has_column_acl
-        assert not cls.world.has_column_acl
-
-    @classmethod
-    def tearDownClass(cls):
-        super().tearDownClass()
-        cls.viewer1_group.user_set.remove(cls.test_user1)
-        cls.cloned_project.delete()
-        ColumnAcl.objects.all().delete()
-
-    def setUp(self):
-        super().setUp()
         ColumnAcl.objects.all().delete()
         self.cloned_layer = Layer.objects.get(pk=self.cloned_layer.pk)
         self.world = Layer.objects.get(pk=self.world.pk)
         assert ColumnAcl.objects.count() == 0
         assert not self.cloned_layer.has_column_acl
         assert not self.world.has_column_acl
+
+        for l in Layer.objects.all():
+            l.has_column_acl = False
+            l.save()
+
+        assert not self.cloned_layer.has_column_acl
+        assert not self.world.has_column_acl
+
+    @classmethod
+    def setUpClass(cls):
+        QdjangoTestBase.setUpClass()
+
+        # Add admin01 to a group
+        cls.viewer1_group = cls.main_roles['Viewer Level 1']
+        cls.viewer1_group.user_set.add(cls.test_user1)
+
+
+
+    @classmethod
+    def tearDownClass(cls):
+        super().tearDownClass()
+        cls.viewer1_group.user_set.remove(cls.test_user1)
+
+    def tearDown(self):
+        super().tearDown()
+        #self.cloned_project.delete()
+        #ColumnAcl.objects.all().delete()
+
+
 
     def _testApiCallAdmin01(self, view_name, args, kwargs={}):
         """Utility to make test calls for admin01 user, returns the response"""
