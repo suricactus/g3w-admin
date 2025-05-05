@@ -920,7 +920,7 @@ class LayerSerializer(G3WRequestSerializer, serializers.ModelSerializer):
 
         # eval editor_form_structure
         if ret['editor_form_structure']:
-            ret['editor_form_structure'] = eval(instance.editor_form_structure)
+            ret['editor_form_structure'] = instance.get_editor_form_structure()
 
         # add ows
         ret['ows'] = self.get_ows(instance)
@@ -959,8 +959,8 @@ class WidgetSerializer(serializers.ModelSerializer):
 
         body = json.loads(instance.body)
 
-        # get edittype
-        edittypes = eval(self.layer.edittypes)
+        # Get edittype
+        edittypes = self.layer.get_edittypes()
 
         has_relations = 'search' == instance.widget_type and '' != body.get('relations', '')
 
