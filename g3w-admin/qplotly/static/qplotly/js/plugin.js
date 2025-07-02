@@ -517,7 +517,7 @@
           if (1!== i) {
             this.#CHARTS[i].$destroy();                                       // remove container
             this.#CHARTS.splice(i, 1);
-            this.config.plots.forEach(p => p.loaded && this.clearData(plot)); // clear plot data
+            this.config.plots.forEach(p => p.loaded && this.clearData(p)); // clear plot data
           }
         }
 
