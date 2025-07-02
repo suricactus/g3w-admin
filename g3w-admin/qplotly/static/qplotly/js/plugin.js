@@ -99,10 +99,12 @@
               class:    GUI.getFontClass('chart'),
               state:    Vue.observable({ toggled: layer.features.reduce((a, _ , i ) => { a[i] = null; return a; }, {}) }),
               hint:     'sdk.mapcontrols.query.actions.relations_charts.hint',
-              cbk: throttle((layer, feature, action, index, container) => {
+              cbk: throttle(async (layer, feature, action, index, container) => {
                 action.state.toggled[index] = !action.state.toggled[index];
                 if (action.state.toggled[index]) {
-                  this.toggleCharts({
+                  //disabel content
+                  GUI.disableContent(true);
+                  await this.toggleCharts({
                     show: true,
                     ids: charts,
                     container,
@@ -112,6 +114,8 @@
                       height:    400
                     }
                   });
+                  //enable content after loading
+                  GUI.disableContent(false);
                   _container = container; // save container to action
                 } else {
                   this.toggleCharts({ show: false, container });
@@ -142,11 +146,11 @@
         const sidebar = this.#SIDEBAR = this.createSideBarComponent({
           data: () => ({ service: this }),
           template: /* html */ `
-            <ul class="treeview-menu" style="padding: 10px; color:#FFF;">
-              <li v-for="plot in service.config.plots" :key="plot.id" :hidden="!plot.show_position.includes('sidebar')">
-                <input type="checkbox" :id="plot.id" @change="service.toggleCharts({ id: plot.id })" v-model="plot.show" class="magic-checkbox" />
-                <label :for="plot.id" style="display:flex; justify-content: space-between;">
-                  <span style="white-space: pre-wrap">{{ plot.label }} </span>{{ plot.type }}
+            <ul class = "treeview-menu" style = "padding: 10px; color:#FFF;">
+              <li v-for = "plot in service.config.plots" :key = "plot.id" :hidden = "!plot.show_position.includes('sidebar')">
+                <input type="checkbox" :id = "plot.id" @change = "service.toggleCharts({ id: plot.id })" v-model = "plot.show" class = "magic-checkbox" />
+                <label :for = "plot.id" style = "display:flex; justify-content: space-between;">
+                  <span style = "white-space: pre-wrap">{{ plot.label }} </span>{{ plot.type }}
                 </label>
               </li>
             </ul>`,
@@ -222,6 +226,9 @@
       plotIds,
       rel,
     } = {}) {
+
+      //start to loading
+      this.setLoading(true);
 
       // check if it has relation data
       this.state.rel = rel;
@@ -455,6 +462,9 @@
         this.state.bbox_ids = [];
       }
 
+      //sto loading
+      this.setLoading(false);
+
       return Promise.resolve({ order, charts });
     }
 
@@ -496,7 +506,9 @@
             rel,
             service: this,
             container
-          }}).$mount());
+          }}).$mount());  
+          //need to wait util loading is false
+          await new Promise((res) => this.#CHARTS[0].$watch(() => this.state.loading, (l) => !l && res(), { immediate: true }))
         }
 
         // hide charts (remove from DOM)
@@ -644,7 +656,6 @@
       this.state.loading = b;
       if (undefined === this.state.rel) {
         document.querySelector('#qplotly').classList.toggle('g3w-disabled', b);
-        GUI.setLoadingContent(b);
       }
     }
 
