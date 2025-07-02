@@ -231,7 +231,8 @@
 
       // plots request from Query Result Service
       if (layerIds) {
-        plots = this.config.plots.filter(p => -1 !== layerIds.indexOf(p.qgs_layer_id));
+        //need to filter only query position and plot that has layerIds
+        plots = this.config.plots.filter(p => p.show_position.includes('query') && layerIds.find(id => p.qgs_layer_id === id));
       }
 
       // plots that have id belong to plotIds array set by check uncheck plot on sidebar interface
@@ -257,7 +258,6 @@
           }
         });
       }
-
 
       // plots that have attribute show to true and not in relation with other plot show
       // if not belong to show plot father relation
