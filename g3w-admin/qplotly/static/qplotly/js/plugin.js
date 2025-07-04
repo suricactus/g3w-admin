@@ -98,7 +98,7 @@
               opened:   true,
               class:    GUI.getFontClass('chart'),
               state:    Vue.observable({ toggled: layer.features.reduce((a, _ , i ) => { a[i] = null; return a; }, {}) }),
-              hint:     'sdk.mapcontrols.query.actions.relations_charts.hint',
+              hint:     'Show relations chart',
               cbk: throttle(async (layer, feature, action, index, container) => {
                 action.state.toggled[index] = !action.state.toggled[index];
                 if (action.state.toggled[index]) {
