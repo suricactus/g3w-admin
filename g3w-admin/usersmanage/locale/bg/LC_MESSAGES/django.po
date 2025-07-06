@@ -48,6 +48,18 @@ msgstr ""
 "Разпространи правата на <b>НОВИ</b> прегледачи и нови потребителски групи "
 "прегледачи"
 
+#: usersmanage/forms.py:294
+msgid "Department"
+msgstr "Отдел"
+
+#: usersmanage/forms.py:295 usersmanage/templates/usersmanage/user_list.html:48
+msgid "Backend"
+msgstr "Бекенд"
+
+#: usersmanage/forms.py:296 usersmanage/models.py:21
+msgid "Avatar"
+msgstr "Аватар"
+
 #: usersmanage/forms.py:297 usersmanage/forms.py:922 usersmanage/models.py:22
 msgid "Other informations"
 msgstr "Друга информация"
@@ -163,10 +175,6 @@ msgstr "Потребителят {user} няма роля {cop_role}"
 #: usersmanage/forms.py:958
 msgid "No user is available with this email."
 msgstr "Няма потребител с този имейл."
-
-#: usersmanage/models.py:21
-msgid "Avatar"
-msgstr "Аватар"
 
 #: usersmanage/models.py:23
 msgid "Registered user"
@@ -400,10 +408,6 @@ msgstr "Име"
 #: usersmanage/templates/usersmanage/user_list.html:45
 msgid "Last name"
 msgstr "Фамилия"
-
-#: usersmanage/templates/usersmanage/user_list.html:48
-msgid "Backend"
-msgstr "Бекенд"
 
 #: usersmanage/utils.py:236
 msgid "ACL Users"
