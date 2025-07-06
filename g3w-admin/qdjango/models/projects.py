@@ -3,13 +3,13 @@ import os
 import time
 
 from django.core.exceptions import ObjectDoesNotExist
-from django_extensions.db.fields import AutoSlugField
 from django.db.models import UniqueConstraint
 from ordered_model.models import OrderedModel
 from core.configs import *
 from core.mixins.models import G3WACLModelMixins, G3WProjectMixins
 from core.models import (BaseLayer, Group, GroupProjectPanoramic,
                          ProjectMapUrlAlias)
+from core.fields import AutoSlugField
 from core.receivers import check_overviewmap_project
 from core.utils import unicode2ascii
 from core.utils.slugify import slugify
