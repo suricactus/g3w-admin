@@ -24,23 +24,23 @@ import random
 import logging
 
 class G3W2Tree(TreeBase):
-    module = models.CharField('Qdjango2 Module', max_length=50, null=True, blank=True)
+    module = models.CharField(_('Qdjango2 module'), max_length=50, null=True, blank=True)
 
 
 class G3W2TreeItem(TreeItemBase):
-    type_header = models.BooleanField('Tipo header', default=False, blank=True)
-    icon_css_class = models.CharField('Icon css class', max_length=50,null=True, blank=True)
+    type_header = models.BooleanField(_('Type header'), default=False, blank=True)
+    icon_css_class = models.CharField(_('Icon CSS class'), max_length=50,null=True, blank=True)
 
 
 class G3WSpatialRefSys(models.Model):
     """
     Clone of Postgis spatial_ref_sys for no geo database
     """
-    srid = models.IntegerField(primary_key=True)
-    auth_name = models.CharField(max_length=256)
-    auth_srid = models.IntegerField()
-    srtext = models.CharField(max_length=2048)
-    proj4text = models.CharField(max_length=2048)
+    srid = models.IntegerField(_('SRID'), primary_key=True)
+    auth_name = models.CharField(_('SRS name'), max_length=256)
+    auth_srid = models.IntegerField(_('SRS ID'))
+    srtext = models.CharField(_('WKT SRS'), max_length=2048)
+    proj4text = models.CharField(_('PROJ coordinate definition'), max_length=2048)
 
     def __str__(self):
         '''
@@ -57,26 +57,26 @@ class BaseLayer(OrderedModel):
     """
     Model to store Base layers
     """
-    name = models.CharField(max_length=255)
-    title = models.CharField(max_length=255)
-    icon = models.ImageField(null=True, blank=True)
-    description = models.TextField(null=True, blank=True)
-    property = models.TextField()
+    name = models.CharField(_('Name'), max_length=255)
+    title = models.CharField(_('Title'), max_length=255)
+    icon = models.ImageField(_('Icon'), null=True, blank=True)
+    description = models.TextField(_('Description'), null=True, blank=True)
+    property = models.TextField(_('Property'))
 
     def __str__(self):
         return "{} ({})".format(self.title, self.name)
 
     class Meta(OrderedModel.Meta):
-        verbose_name = 'Base Layer'
-        verbose_name_plural = 'Base Layers'
+        verbose_name = _('Base Layer')
+        verbose_name_plural = _('Base Layers')
 
 
 class MapControl(OrderedModel):
     """
     Model for Map Controls: zoom, query, etc..
     """
-    name = models.CharField(max_length=255)
-    description = models.TextField(null=True, blank=True)
+    name = models.CharField(_('Name'), max_length=255)
+    description = models.TextField(_('Description'), null=True, blank=True)
 
     def __str__(self):
         return self.name
@@ -459,9 +459,9 @@ class ProjectMapUrlAlias(models.Model):
     Model to set alias map url
     ie: /map/qdjango/group-slug/1 => /map/<alias_field_value>
     """
-    app_name = models.CharField(max_length=255)
-    project_id = models.IntegerField()
-    alias =models.CharField(max_length=512, unique=True)
+    app_name = models.CharField(_('App name'), max_length=255)
+    project_id = models.IntegerField(_('Project ID'), )
+    alias =models.CharField(_('Alias'), max_length=512, unique=True)
 
 
 LOG_LEVELS = (
@@ -476,18 +476,19 @@ class StatusLog(models.Model):
     """
     Model to store log's row inside DB
     """
-    logger_name = models.CharField(max_length=100)
-    level = models.PositiveSmallIntegerField(choices=LOG_LEVELS, default=logging.ERROR, db_index=True)
-    msg = models.TextField()
-    trace = models.TextField(blank=True, null=True)
-    create_datetime = models.DateTimeField(auto_now_add=True, verbose_name='Created at')
+    logger_name = models.CharField(_('Logger name'), max_length=100)
+    level = models.PositiveSmallIntegerField(_('Level'), choices=LOG_LEVELS, default=logging.ERROR, db_index=True)
+    msg = models.TextField(_('Message'))
+    trace = models.TextField(_('Trace'), blank=True, null=True)
+    create_datetime = models.DateTimeField(auto_now_add=True, verbose_name=_('Created at'))
 
     def __str__(self):
         return self.msg
 
     class Meta:
         ordering = ('-create_datetime',)
-        verbose_name_plural = verbose_name = 'Logging'
+        verbose_name = _('Logging')
+        verbose_name_plural = _('Logging')
 
 
 def generate_short_code(length=6):
@@ -496,8 +497,8 @@ def generate_short_code(length=6):
 
 class ShortURL(TimeStampedModel):
     """ Model to store short code for shor url"""
-    original_url = models.URLField(max_length=2000)
-    short_code = models.CharField(max_length=10, unique=True, blank=True)
+    original_url = models.URLField(_('Original URL'), max_length=2000)
+    short_code = models.CharField(_('Short code'), max_length=10, unique=True, blank=True)
 
 
     def save(self, *args, **kwargs):
@@ -519,8 +520,8 @@ class PermaLinkURL(TimeStampedModel):
     I.e. current extent, toc layer switched on/off annotations etc.
     """
 
-    data = models.JSONField()
-    permalink_code = models.CharField(max_length=10, unique=True, blank=True)
+    data = models.JSONField(_("Data"))
+    permalink_code = models.CharField(_("Permalink code"), max_length=10, unique=True, blank=True)
 
     def save(self, *args, **kwargs):
         if not self.permalink_code:
