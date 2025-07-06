@@ -36,4 +36,12 @@ class Migration(migrations.Migration):
             name='srid',
             field=models.ForeignKey(db_column='srid', on_delete=django.db.models.deletion.DO_NOTHING, to='core.g3wspatialrefsys', verbose_name='SRID'),
         ),
+        migrations.AlterModelOptions(
+            name='group',
+            options={'ordering': ('order',), 'permissions': (('add_project_to_group', 'Can add project to the group'),), 'verbose_name': 'Group', 'verbose_name_plural': 'Groups'},
+        ),
+        migrations.AlterModelOptions(
+            name='macrogroup',
+            options={'ordering': ('order',), 'verbose_name': 'MACRO Group', 'verbose_name_plural': 'MACRO Groups'},
+        ),
     ]

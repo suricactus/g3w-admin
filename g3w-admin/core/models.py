@@ -125,6 +125,8 @@ class MacroGroup(TimeStampedModel, OrderedModel):
         self._permissions_to_editors(users_id, 'remove')
 
     class Meta():
+        verbose_name = _('MACRO Group')
+        verbose_name_plural = _('MACRO Groups')
         ordering = ("order",)
 
 
@@ -173,6 +175,8 @@ class Group(TimeStampedModel, OrderedModel):
                                                       'precendence'))
 
     class Meta():
+        verbose_name = _('Group')
+        verbose_name_plural = _('Groups')
         permissions = (
             ('add_project_to_group', 'Can add project to the group'),
         )
