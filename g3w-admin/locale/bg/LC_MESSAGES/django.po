@@ -263,10 +263,24 @@ msgid "Dashboard"
 msgstr "Табло"
 
 #: templates/base.html:229
-msgid "Version"
-msgstr "Версия"
+#, python-format
+msgid ""
+"<strong>G3W-SUITE Version %(version)s</strong>: administration GIS "
+"application."
+msgstr ""
+"<strong>G3W-SUITE версия %(version)s</strong>: административно ГИС "
+"приложение."
 
-#: templates/base.html:249
+#: templates/base.html:236
+#, python-format
+msgid ""
+"<strong>Copyright &copy; 2015 - %(year)s <a href=\"http://www.gis3w."
+"it\">GIS3W</a>.</strong> All rights reserved."
+msgstr ""
+"<strong>Авторско право &copy; 2015 - %(year)s <a href=\"http://www.gis3w."
+"it\">GIS3W</a>.</strong> Всички права запазени."
+
+#: templates/base.html:254
 msgid ""
 "This website uses cookies to ensure you get the best experience on our "
 "website"
@@ -523,3 +537,6 @@ msgstr "Намерени "
 #: templates/search.html:16
 msgid " results."
 msgstr " Резултати."
+
+#~ msgid "Version"
+#~ msgstr "Версия"
