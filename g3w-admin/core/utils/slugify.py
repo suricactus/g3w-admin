@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.utils.module_loading import import_string
 from django.utils.text import slugify as original_django_slugify
+from django.utils.encoding import smart_str
 
 from slugify import slugify as python_slugify
 
@@ -59,7 +60,7 @@ def pyslugify(content):
         pyslugify('jaja---lol-méméméoo--a') # 'jaja-lol-mememeoo-a'
         pyslugify('i love 🦄') # 'i-love'
     """
-    return python_slugify(content)
+    return python_slugify(smart_str(content))
 
 
 def slugify(content):
