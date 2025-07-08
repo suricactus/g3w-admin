@@ -11,6 +11,7 @@ __date__ = '2025-04-29'
 __copyright__ = 'Copyright 2025, Gis3w'
 
 
+from django.conf import settings
 from django.urls import reverse, resolve
 from django.http import HttpRequest
 from qdjango.vector import LayerVectorView
@@ -72,7 +73,16 @@ class QGISElasticsearchIndexer:
                     "geometry_type": {"type": "keyword"},
                     #"geometry": {"type": "geo_shape"},
                     "attributes": {"type": "object", "dynamic": True},
-                    "text_content": {"type": "text", "analyzer": "standard"},
+                    "text_content": {
+                        "type": "text", 
+                        "analyzer": "standard",
+                        "fields": {
+                            "raw": {
+                            "type": "keyword",
+                            "normalizer": "lowercase_normalizer"
+                            }
+                        }
+                    },
                     "indexed_at": {"type": "date"}
                 }
             }
@@ -86,6 +96,13 @@ class QGISElasticsearchIndexer:
                             "type": "custom",
                             "tokenizer": "standard",
                             "filter": ["lowercase", "asciifolding"]
+                        }
+                    },
+                    "normalizer": {
+                        "lowercase_normalizer": {
+                            "type": "custom",
+                            "char_filter": [],
+                            "filter": ["lowercase"]
                         }
                     }
                 }
@@ -117,7 +134,8 @@ class QGISElasticsearchIndexer:
 
             # Create text_content
             text_content = []
-            for v in feature['properties'].values():
+            attributes = {}
+            for k, v in feature['properties'].items():
                 if v is not None:
 
                     # Case for nested dictionaries, i.e for media file:
@@ -131,8 +149,10 @@ class QGISElasticsearchIndexer:
                         for subk, subv in v.items():
                             if subv is not None and subk == 'value':
                                 text_content.append(subv)
+                                attributes[k] = v
                     else:
                         text_content.append(str(v))
+                        attributes[k] = str(v)
 
             # Extract the attributes
             # Create ES document
@@ -147,7 +167,7 @@ class QGISElasticsearchIndexer:
                     "feature_id": feature['id'],
                     "geometry_type": "",
                     # "geometry": feature['geometry'],
-                    "attributes": feature['properties'],
+                    "attributes": attributes,
                     "text_content": " ".join(text_content),
                     "indexed_at": datetime.datetime.now().isoformat()
                 }
@@ -438,19 +458,21 @@ class QGISElasticsearchIndexer:
             list: List of search results
         """
 
-        # Create the base query
-        query = {
-            "bool": {
-                "must": [
-                    {"multi_match": {
-                        "query": query_text,
-                        "fields": ["text_content^2", "layer_name"],
-                        "type": "best_fields",
-                        "fuzziness": "AUTO"
-                    }}
-                ]
-            }
-        }
+        def replace_placeholder(d, placeholder, value):
+            if isinstance(d, dict):
+                return {k: replace_placeholder(v, placeholder, value) for k, v in d.items()}
+            elif isinstance(d, list):
+                return [replace_placeholder(v, placeholder, value) for v in d]
+            elif d in (placeholder, f"*{placeholder}*"):
+                if d == placeholder:
+                    return value
+                else:
+                    return f"*{value}*"
+            else:
+                return d
+
+
+        query = replace_placeholder(settings.QES_SEARCH_QUERY, '$query_text', query_text)
 
         # Add specific filters
         if filters:
