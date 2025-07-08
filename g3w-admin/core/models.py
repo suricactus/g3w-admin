@@ -125,6 +125,8 @@ class MacroGroup(TimeStampedModel, OrderedModel):
         self._permissions_to_editors(users_id, 'remove')
 
     class Meta():
+        verbose_name = _('MACRO Group')
+        verbose_name_plural = _('MACRO Groups')
         ordering = ("order",)
 
 
@@ -146,16 +148,16 @@ class Group(TimeStampedModel, OrderedModel):
                                        help_text=_('Enter link with http:// or https//'))
 
     # Group SRID (a.k.a. EPSG)
-    srid = models.ForeignKey(G3WSpatialRefSys, db_column='srid', on_delete=models.DO_NOTHING)
+    srid = models.ForeignKey(G3WSpatialRefSys, db_column='srid', on_delete=models.DO_NOTHING, verbose_name=_('SRID'))
 
     # baselayers
-    baselayers = models.ManyToManyField(BaseLayer, blank=True)
+    baselayers = models.ManyToManyField(BaseLayer, blank=True, verbose_name=_('Base layers'))
 
     # mapcontrols
-    mapcontrols = models.ManyToManyField(MapControl)
+    mapcontrols = models.ManyToManyField(MapControl, verbose_name=_('Map controls'))
 
     # background color map default
-    background_color = models.CharField(max_length=7, default='#ffffff', blank=True)
+    background_color = models.CharField(_('Background color'), max_length=7, default='#ffffff', blank=True)
 
     # Company TOS
     header_terms_of_use_text = models.TextField(
@@ -165,7 +167,7 @@ class Group(TimeStampedModel, OrderedModel):
         _('Terms of use link'), blank=True
         )
 
-    macrogroups = models.ManyToManyField(MacroGroup, blank=True)
+    macrogroups = models.ManyToManyField(MacroGroup, blank=True, verbose_name=_('MACRO groups'))
 
     use_logo_client = models.BooleanField(_('Use logo image for client'), default=False,
                                           help_text=_('As for MacroGroup options is possible to use current logo group '
@@ -173,6 +175,8 @@ class Group(TimeStampedModel, OrderedModel):
                                                       'precendence'))
 
     class Meta():
+        verbose_name = _('Group')
+        verbose_name_plural = _('Groups')
         permissions = (
             ('add_project_to_group', 'Can add project to the group'),
         )
