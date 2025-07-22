@@ -1,0 +1,89 @@
+name: Extract Django Translations
+
+on:
+    workflow_dispatch:
+    schedule:
+      # Runs every day at 2:00 AM UTC
+      - cron: '0 2 * * *'
+
+jobs:
+  extract_translations:
+    runs-on: ubuntu-latest
+
+    env:
+      COMPOSE_FILE: docker-compose.latest.yml
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+            python-version: '3.12'
+
+      - name: Starting Docker compose
+        run: docker compose up -d
+
+      - name: Copying code into the container
+        run: |
+            docker cp ./ "$(docker compose ps -q g3w-suite)":/code
+
+      - name: Installing Python requirements
+        run: |
+          docker compose exec -T g3w-suite sh -c "cd /code/ && pip3 install -r requirements_docker.txt --break-system-packages && pip3 install -r requirements_huey.txt --break-system-packages"
+
+      - name: Installing Caching Python requirements
+        run: |
+          docker compose exec -T g3w-suite sh -c "cd /code/ && pip3 install -r g3w-admin/caching/requirements.txt --break-system-packages"
+
+      - name: Installing Filemanager Python requirements
+        run: |
+          docker compose exec -T g3w-suite sh -c "cd /code/ && pip3 install -r g3w-admin/filemanager/requirements.txt --break-system-packages"
+
+      - name: Installing Qplotly Python requirements
+        run: |
+          docker compose exec -T g3w-suite sh -c "cd /code/ && pip3 install -r g3w-admin/qplotly/requirements.txt --break-system-packages"
+
+      - name: Installing Openrouteservice Python requirements
+        run: |
+          docker compose exec -T g3w-suite sh -c "cd /code/ && pip3 install -r g3w-admin/openrouteservice/requirements.txt --break-system-packages && pip3 install -r g3w-admin/openrouteservice/requirements_testing.txt --break-system-packages"
+
+      - name: Building g3w-suite
+        run: |
+          docker compose exec -T g3w-suite sh -c "/code/ci_scripts/build_suite.sh"
+
+      - name: Setting up g3w-suite
+        run: |
+          docker compose exec -T g3w-suite sh -c "/code/ci_scripts/setup_suite.sh"
+
+      - name: Starting Docker compose
+        run: docker compose up -d
+
+      - name: Copying code into the container
+        run: |
+            docker cp ./ "$(docker compose ps -q g3w-suite)":/code
+
+      - name: Setting up g3w-suite
+        run: |
+          docker compose exec -T g3w-suite sh -c "/code/ci_scripts/setup_suite.sh"
+
+      - name: Starting Django
+        run: |
+          docker compose exec -T g3w-suite sh -c "cd /code/g3w-admin && python3 manage.py runserver 0.0.0.0:8000" &
+
+      - name: Waiting for Django
+        run: |
+          docker compose exec -T g3w-suite sh -c "wait-for-it -h localhost -p 8000 -t 240"
+
+      - name: Install dependencies
+        run: |
+          docker compose exec -T g3w-suite sh -c "apt update && apt install gettext"
+          docker compose exec -T g3w-suite sh -c "python3 manage.py makemessages -a"
+          docker compose exec -T g3w-suite sh -c "python3 manage.py compilemessages -a"
+
+      - name: Commit and push changes
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+            commit_message: update translations
+            file_pattern: 'locale/**/django*.po locale/**/django*.mo'
