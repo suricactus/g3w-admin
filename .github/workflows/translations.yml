@@ -78,7 +78,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          docker compose exec -T g3w-suite sh -c "apt update && apt install gettext"
+          docker compose exec -T g3w-suite sh -c "apt update && apt install -y gettext"
           docker compose exec -T g3w-suite sh -c "python3 manage.py makemessages -a"
           docker compose exec -T g3w-suite sh -c "python3 manage.py compilemessages -a"
 
