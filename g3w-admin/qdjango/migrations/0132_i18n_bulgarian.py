@@ -6,8 +6,8 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('qdjango', '0130_layer_scalebasedvisibility_style'),
-        ('core', '0092_i18n_bulgarian'),
+        ('qdjango', '0131_alter_layer_slug_alter_project_slug_and_more'),
+        ('core', '0093_i18n_bulgarian'),
     ]
 
     operations = [

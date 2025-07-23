@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('core', '0091_add_verbose_names_and_nothing_more_v2'),
+        ('core', '0092_merge_20250708_0849'),
     ]
 
     operations = [
