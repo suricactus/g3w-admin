@@ -79,6 +79,9 @@ jobs:
       - name: Install dependencies
         run: |
           docker compose exec -T g3w-suite sh -c "apt update && apt install -y gettext"
+
+      - name: Make and Compile Messages
+        run: |
           docker compose exec -T g3w-suite sh -c "cd g3w-admin && python3 manage.py makemessages"
           docker compose exec -T g3w-suite sh -c "cd g3w-admin && python3 manage.py compilemessages"
 
