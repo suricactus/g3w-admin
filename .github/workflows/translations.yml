@@ -89,4 +89,4 @@ jobs:
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
             commit_message: update translations
-            file_pattern: 'locale/**/django*.po locale/**/django*.mo'
+            file_pattern: 'g3w-admin/**/locale/**/django*.po g3w-admin/**/locale/**/django*.mo'
