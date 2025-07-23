@@ -82,7 +82,7 @@ jobs:
 
       - name: Make and Compile Messages
         run: |
-          docker compose exec -T g3w-suite sh -c "cd g3w-admin && python3 manage.py makemessages"
+          docker compose exec -T g3w-suite sh -c "cd g3w-admin && python3 manage.py makemessages --all"
           docker compose exec -T g3w-suite sh -c "cd g3w-admin && python3 manage.py compilemessages"
 
       - name: Commit and push changes
