@@ -79,8 +79,8 @@ jobs:
       - name: Install dependencies
         run: |
           docker compose exec -T g3w-suite sh -c "apt update && apt install -y gettext"
-          docker compose exec -T g3w-suite sh -c "cd g3w-admin && python3 manage.py makemessages -a"
-          docker compose exec -T g3w-suite sh -c "cd g3w-admin && python3 manage.py compilemessages -a"
+          docker compose exec -T g3w-suite sh -c "cd g3w-admin && python3 manage.py makemessages"
+          docker compose exec -T g3w-suite sh -c "cd g3w-admin && python3 manage.py compilemessages"
 
       - name: Commit and push changes
         uses: stefanzweifel/git-auto-commit-action@v5
