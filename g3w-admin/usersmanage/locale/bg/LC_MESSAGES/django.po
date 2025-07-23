@@ -54,7 +54,7 @@ msgstr "Отдел"
 
 #: usersmanage/forms.py:295 usersmanage/templates/usersmanage/user_list.html:48
 msgid "Backend"
-msgstr "Бекенд"
+msgstr "Администрация"
 
 #: usersmanage/forms.py:296 usersmanage/models.py:21
 msgid "Avatar"
@@ -112,7 +112,7 @@ msgstr "Данни за потребителя"
 
 #: usersmanage/forms.py:446
 msgid "User backend"
-msgstr "Потребителски бекенд"
+msgstr "Потребителска администрация"
 
 #: usersmanage/forms.py:649
 msgid "User can't be Editor level 1 and at same time Editor level 2"
